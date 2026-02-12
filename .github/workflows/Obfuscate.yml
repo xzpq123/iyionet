@@ -5,11 +5,12 @@ on:
     branches:
       - main
   schedule:
-    # 每天凌晨1:00运行
+    # 每天凌晨1:00 UTC运行（北京时间 09:00）
     - cron: "0 1 * * *"
+  workflow_dispatch:  # 手动触发
 
 permissions:
-  contents: write
+  contents: write  # 允许 workflow 提交代码回仓库
 
 jobs:
   build:
@@ -30,11 +31,11 @@ jobs:
 
       - name: 下载 BPB worker.js
         run: |
-          wget -O origin.js https://raw.githubusercontent.com/bia-pain-bache/BPB-Worker-Panel/main/build/unobfuscated-worker.js
+          wget -O origin.js https://raw.githubusercontent.com/bia-pain-bache/BPB-Worker-Panel/main/build/unobfuscated-worker.js || exit 1
 
       - name: 混淆 BPB worker.js
         run: |
-          javascript-obfuscator origin.js --output _worker.js \
+          javascript-obfuscator origin.js --output _workerjs \
             --compact true \
             --control-flow-flattening false \
             --dead-code-injection false \
@@ -52,4 +53,3 @@ jobs:
           branch: main
           commit_message: ':arrow_up: 更新最新的 BPB 面板'
           commit_author: 'github-actions[bot] <github-actions[bot]@users.noreply.github.com>'
-          push_options: '--set-upstream'
